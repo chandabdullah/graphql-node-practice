@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
+const { default: mongoose } = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config({ path: '.env' });
 
 const app = express();
 
@@ -67,6 +70,14 @@ app.get('/health', (req, res, next) => {
     res.send('Hello, GraphQL API!');
 });
 
-const PORT = process.env.PORT || 3000;
+async function connectDatabase() {
+    const DB_NAME = 'graphql_events';
+    const DB_PATH = `${process.env.MONGODB_URI}/${DB_NAME}`;
+    // console.log("DB_PATH: ", DB_PATH);
+    const connectionInstance = await mongoose.connect(`${DB_PATH}`);
+    console.log(
+        `======================== \nMongoDB connected...!! \nDB HOST: ${connectionInstance.connection.host}\nDB HOST: ${connectionInstance.connection.name}\n========================`
+    );
+}
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+connectDatabase();
